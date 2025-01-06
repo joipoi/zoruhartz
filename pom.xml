@@ -39,6 +39,11 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.mnode.ical4j</groupId>
+            <artifactId>ical4j</artifactId>
+            <version>4.0.8</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -60,7 +65,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.example.zoruhartz.HelloApplication</mainClass> <!-- Update with your main class -->
+                            <mainClass>com.example.zoruhartz.Main</mainClass> <!-- Update with your main class -->
                         </manifest>
                     </archive>
                 </configuration>
@@ -74,7 +79,7 @@
                     <execution>
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>com.example.zoruhartz.HelloApplication</mainClass>
+                            <mainClass>com.example.zoruhartz.Main</mainClass>
                             <launcher>app</launcher>
                             <jlinkZipName>app</jlinkZipName>
                             <jlinkImageName>app</jlinkImageName>
