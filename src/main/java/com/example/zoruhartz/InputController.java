@@ -1,17 +1,13 @@
 package com.example.zoruhartz;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-import java.io.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.temporal.ChronoUnit;
 
 
 public class InputController {
@@ -22,9 +18,11 @@ public class InputController {
     @FXML
     private TextField surname;
     @FXML
-    private DatePicker receiptDate;
+    private DatePicker startDate;
     @FXML
-    private TextField time;
+    private DatePicker endDate;
+    @FXML
+    private TextField endDateTime;
     @FXML
     private TextArea description;
     @FXML
@@ -39,8 +37,6 @@ public class InputController {
 
     // No-argument constructor
     public InputController() {
-        // Default initialization, if necessary
-        System.out.println("In no-argument constructor");
     }
 
     // Setter method to pass data
@@ -62,13 +58,46 @@ public class InputController {
             description.setText(data.getDescription());
             material.setText(data.getMaterial());
             toothColor.setText(data.getToothColor());
+            startDate.setValue(LocalDate.from(data.getStartDate()));
+            endDate.setValue(LocalDate.from(data.getEndDate()));
+
+            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+            endDateTime.setText(data.getEndDate().format(timeFormatter));
+            updateProgress();
         }
     }
 
     @FXML
     public void initialize() {
-        progressBar.setProgress(0.8);
-        System.out.println("In initialize, currentCase: " + currentCase);
+
+    }
+
+    private void updateProgress() {
+        LocalDate currentDate = LocalDate.now();
+
+        // Ensure startDate and endDate are not null
+        if (startDate != null && endDate != null) {
+            // Calculate total duration
+            long totalDays = ChronoUnit.DAYS.between(currentCase.getStartDate(), currentCase.getEndDate());
+
+            // Calculate elapsed duration
+            long elapsedDays = ChronoUnit.DAYS.between(currentCase.getStartDate(), currentDate);
+
+            // Ensure progress does not exceed 100%
+            if (elapsedDays < 0) {
+                // Case has not started yet
+                progressBar.setProgress(0);
+            } else if (elapsedDays > totalDays) {
+                // Case has already ended
+                progressBar.setProgress(1);
+            } else {
+                // Calculate progress as a fraction
+                double progress = (double) elapsedDays / totalDays;
+                progressBar.setProgress(progress);
+            }
+        } else {
+            progressBar.setProgress(0); // Default to 0 if dates are not set
+        }
     }
 
     @FXML
@@ -80,11 +109,12 @@ public class InputController {
         String descriptionValue = description.getText();
         String toothColorValue = toothColor.getText();
         String materialValue = material.getText();
+        LocalDate startDateValue = startDate.getValue();
 
         // Get the selected date and time
         LocalDateTime receiptDateTime = null;
-        if (receiptDate.getValue() != null && !time.getText().isEmpty()) {
-            String dateString = receiptDate.getValue().toString() + " " + time.getText();
+        if (endDate.getValue() != null && !endDateTime.getText().isEmpty()) {
+            String dateString = endDate.getValue().toString() + " " + endDateTime.getText();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
             receiptDateTime = LocalDateTime.parse(dateString, formatter);
         }
@@ -93,54 +123,31 @@ public class InputController {
             currentCase.setName(nameValue);
             currentCase.setSurname(surnameValue);
             currentCase.setDescription(descriptionValue);
-            currentCase.setReceiptDate(receiptDateTime);
             currentCase.setToothColor(toothColorValue);
             currentCase.setMaterial(materialValue);
+            currentCase.setStartDate(startDateValue);
+            currentCase.setEndDate(receiptDateTime);
             System.out.println("Updated case: " + currentCase);
+
+            int index = MainController.caseList.indexOf(currentCase);
+            if (index != -1) {
+                MainController.caseList.set(index, currentCase); // Replace the item
+            }
         } else {
             Case newCase = new Case(caseIdValue, nameValue, surnameValue, descriptionValue,
-                    receiptDateTime, toothColorValue, materialValue);
+                    startDateValue, receiptDateTime, toothColorValue, materialValue, false);
             MainController.addCase(newCase);
             System.out.println("Added new case: " + newCase);
         }
 
         Stage stage = (Stage) caseId.getScene().getWindow();
         stage.close();
+
     }
     @FXML
     private void onFinishedButtonClick() {
-
+    currentCase.setFinished(true);
     }
-    @FXML
-    private void exportCasesToCSV() {
-      /*  // Create a FileChooser to select the export location
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Save Cases to CSV");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
 
-        File file = fileChooser.showSaveDialog(null);
-        if (file != null) {
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
-                // Write header
-                writer.write("Case ID,Name,Surname,Description,Receipt Date,Tooth Color,Material");
-                writer.newLine();
-
-                // Write each Case object
-                for (Case caseObj : caseList) {
-                    writer.write(String.format("%s,%s,%s,%s,%s,%s,%s",
-                            caseObj.getCaseId(),
-                            caseObj.getName(),
-                            caseObj.getSurname(),
-                            caseObj.getDescription(),
-                            caseObj.getReceiptDate(),
-                            caseObj.getToothColor(),
-                            caseObj.getMaterial()));
-                    writer.newLine();
-                }
-            } catch (IOException e) {
-                e.printStackTrace(); // Handle exceptions appropriately
-            }
-        } */
-    }
 
 }

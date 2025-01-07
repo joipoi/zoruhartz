@@ -1,11 +1,10 @@
 package com.example.zoruhartz;
 
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Case {
     private final StringProperty caseId;
@@ -14,19 +13,23 @@ public class Case {
     private final StringProperty description;
     private final StringProperty toothColor;
     private final StringProperty material;
+    private final ObjectProperty<LocalDate> startDate;
+    private final ObjectProperty<LocalDateTime> endDate;
+    private final BooleanProperty finished;
 
-    private final ObjectProperty<LocalDateTime> receiptDate;
 
     // Constructor
-    public Case(String caseId, String name, String surname, String description,
-                LocalDateTime receiptDate, String toothColor, String material) {
+    public Case(String caseId, String name, String surname, String description, LocalDate startDate,
+                LocalDateTime endDate, String toothColor, String material, boolean finished) {
         this.caseId = new SimpleStringProperty(caseId);
         this.name = new SimpleStringProperty(name);
         this.surname = new SimpleStringProperty(surname);
         this.description = new SimpleStringProperty(description);
-        this.receiptDate = new SimpleObjectProperty(receiptDate);
+        this.startDate = new SimpleObjectProperty<>(startDate);
+        this.endDate = new SimpleObjectProperty(endDate);
         this.toothColor = new SimpleStringProperty(toothColor);
         this.material = new SimpleStringProperty(material);
+        this.finished = new SimpleBooleanProperty(finished);
     }
 
     // Getters and Setters
@@ -75,22 +78,44 @@ public class Case {
         return material.get();
     }
 
+    public boolean isFinished() {
+        return finished.get();
+    }
+    public void setFinished(Boolean finished) {
+        this.finished.set(finished);
+    }
 
     public void setMaterial(String material) {
         this.material.set(material);
     }
 
-    public LocalDateTime getReceiptDate() {
-        return receiptDate.get();
+    public LocalDateTime getEndDate() {
+        return endDate.get();
+    }
+    public String getEndTime() {
+        LocalDateTime _endDate = endDate.get();
+        if (_endDate != null) {
+            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+            return _endDate.format(timeFormatter);
+        }
+        return null; // or return an empty string, depending on your preferenceSimpleDateFormat localDateFormat = new SimpleDateFormat("HH:mm");
+
+    }
+    public LocalDate getStartDate() {
+        return startDate.get();
+    }
+    public void setStartDate(LocalDate startDate) {
+        this.startDate.set(startDate);
     }
 
-    public void setReceiptDate(LocalDateTime receiptDate) {
-        this.receiptDate.set(receiptDate);
+    public void setEndDate(LocalDateTime endDate) {
+        this.endDate.set(endDate);
     }
+
 
     @Override
     public String toString() {
-        return "id: " + this.getCaseId() + " Name: " + this.getName() + this.getSurname() + " Date: " + this.getReceiptDate();
+        return "id: " + this.getCaseId() + " Name: " + this.getName() + this.getSurname() + " Date: " + this.getEndDate();
     }
 
    /* @Override

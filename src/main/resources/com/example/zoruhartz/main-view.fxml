@@ -9,4 +9,8 @@
 <VBox spacing="10" alignment="CENTER" xmlns:fx="http://javafx.com/fxml" fx:controller="com.example.zoruhartz.MainController">
     <ListView fx:id="listView" />
     <Button onAction="#onAddCase" text="Add case"/>
+    <Button onAction="#onExport" text="Export"/>
+    <Button onAction="#importCasesFromCSV" text="Import" />
+    <Button onAction="#onSave" text="Save" />
+    <Label fx:id="saveLabel"> </Label>
 </VBox>

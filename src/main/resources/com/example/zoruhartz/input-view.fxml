@@ -18,16 +18,16 @@
     <TextField fx:id="name" promptText="name" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
     <TextField fx:id="surname" promptText="surname" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
-    <DatePicker fx:id="receiptDate" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-    <TextField fx:id="time" promptText="12:30" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+    <DatePicker fx:id="startDate" promptText="startDate" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+    <DatePicker fx:id="endDate" promptText="endDate" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+    <TextField fx:id="endDateTime" promptText="12:30" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
 
-    <TextArea fx:id="description" promptText="Case Description" GridPane.rowIndex="3" GridPane.columnIndex="0" GridPane.columnSpan="2"/>
+    <TextArea fx:id="description" promptText="Case Description" GridPane.rowIndex="4" GridPane.columnIndex="0" GridPane.columnSpan="2"/>
 
-    <TextField fx:id="toothColor" promptText="Tooth Color" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
-    <TextField fx:id="material" promptText="Material" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+    <TextField fx:id="toothColor" promptText="Tooth Color" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+    <TextField fx:id="material" promptText="Material" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
 
-    <ProgressBar fx:id="progressBar" GridPane.rowIndex="5" GridPane.columnIndex="0" prefWidth="300"/>
-    <Button onAction="#onFinishedButtonClick" text="Finished" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
-    <Button onAction="#exportCasesToCSV" text="Export" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
-    <Button onAction="#onSave" text="Save" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+    <ProgressBar fx:id="progressBar" GridPane.rowIndex="6" GridPane.columnIndex="0" prefWidth="300"/>
+    <Button onAction="#onFinishedButtonClick" text="Finished" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+    <Button onAction="#onSave" text="Save" GridPane.rowIndex="7" GridPane.columnIndex="1"/>
 </GridPane>
