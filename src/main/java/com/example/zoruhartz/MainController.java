@@ -59,27 +59,29 @@ public class MainController {
                 if (empty || item == null) {
                     setText(null);
                 } else {
-                    // Create a layout for the cell
                     HBox hbox = new HBox();
-                    hbox.setSpacing(10); // Space between elements
+                    hbox.setSpacing(10);
 
-                    // Create Text nodes for each piece of information
                     Text caseIdText = new Text("ID: " + item.getCaseId());
-                    Text nameText = new Text("Name: " + item.getName());
-                    Text surnameText = new Text("Surname: " + item.getSurname());
+                    Text nameText = new Text("Name: " + item.getName() +" "+ item.getSurname());
                     Text endDateText = new Text("End Date: " + item.getEndDate().toString());
                     Text finished = new Text(item.isFinished() ? "Finished" : "Not Finished");
+                    /*
+                    Button deleteButton = new Button("Delete");
+                    deleteButton.setOnAction(event -> {
+                        caseList.removeCase(item);
+                        System.out.println(caseList);
+                        listView.setItems(caseList);
+                    }); */
 
-                    // Add Text nodes to the HBox
-                    hbox.getChildren().addAll(caseIdText, nameText, surnameText, endDateText, finished);
+                    hbox.getChildren().addAll(caseIdText, nameText, endDateText, finished);
 
-                    // Set the HBox as the graphic for the cell
                     setGraphic(hbox);
 
                     if (item.isFinished()) {
-                        setStyle("-fx-background-color: lightgreen;"); // Color for finished
+                        setStyle("-fx-background-color: lightgreen;");
                     } else {
-                        setStyle("-fx-background-color: lightcoral;"); // Color for not finished
+                        setStyle("-fx-background-color: lightcoral;");
                     }
                 }
             }
@@ -88,23 +90,22 @@ public class MainController {
             if (event.getClickCount() == 1) { // Single click
                 Case selectedCase = listView.getSelectionModel().getSelectedItem();
                 if (selectedCase != null) {
-                    openNewWindow(selectedCase, false);
+                    openNewWindow(selectedCase);
                 }
             }
         });
-        File file = new File("src/main/resources/test.csv");
-        caseList.clear(); // Optional: clear existing cases
+        File file = new File("src/main/resources/data.csv");
+        caseList.clear();
         caseList.addAll(importCasesFromCSV(file));
-
     }
 
     @FXML
     private void onAddCase(){
-     openNewWindow(null, true);
+     openNewWindow(null);
     }
     @FXML
     private void onSave(){
-        exportCasesToCSV("src/main/resources/test.csv");
+        exportCasesToCSV("src/main/resources/data.csv");
         saveLabel.setText("Data saved");
     }
     @FXML
@@ -112,17 +113,17 @@ public class MainController {
         exportCasesToCSV(null);
     }
 
-    private void openNewWindow(Case selectedItem, boolean isNewCase) {
+    private void openNewWindow(Case selectedItem) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("input-view.fxml"));
             GridPane newWindowRoot = loader.load();
 
             Stage newWindow = new Stage();
-            newWindow.setTitle("Case List");
+            newWindow.setTitle(selectedItem == null ? "New Case": selectedItem.getCaseId());
             newWindow.setScene(new Scene(newWindowRoot));
 
             InputController newWindowController = loader.getController();
-            newWindowController.setData(isNewCase ? null : selectedItem, isNewCase);
+            newWindowController.setData(selectedItem);
 
             newWindow.show();
         } catch (IOException e) {
@@ -158,11 +159,11 @@ public class MainController {
 
         if (file != null) {
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
-                writer.write("Case ID,Name,Surname,Description,Start Date,End Date,Tooth Color,Material");
+                writer.write("Case ID,Name,Surname,Description,Start Date,End Date,Tooth Color,Material,Finished");
                 writer.newLine();
 
                 for (Case caseObj : caseList) {
-                    writer.write(String.format("%s,%s,%s,%s,%s,%s,%s,%s",
+                    writer.write(String.format("%s,%s,%s,%s,%s,%s,%s,%s,%s",
                             caseObj.getCaseId(),
                             caseObj.getName(),
                             caseObj.getSurname(),
@@ -170,7 +171,8 @@ public class MainController {
                             caseObj.getStartDate(),
                             caseObj.getEndDate(),
                             caseObj.getToothColor(),
-                            caseObj.getMaterial()));
+                            caseObj.getMaterial(),
+                            caseObj.isFinished()));
                     writer.newLine();
                 }
             } catch (IOException e) {
@@ -181,6 +183,7 @@ public class MainController {
 
     public List<Case> importCasesFromCSV(File file) {
         List<Case> cases = new ArrayList<>();
+        final int fieldsCount = 9;
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
@@ -190,7 +193,7 @@ public class MainController {
             while ((line = reader.readLine()) != null) {
                 String[] fields = line.split(",");
 
-                if (fields.length == 8) {
+                if (fields.length == fieldsCount) {
                     String caseId = fields[0];
                     String name = fields[1];
                     String surname = fields[2];
@@ -202,8 +205,9 @@ public class MainController {
                     LocalDateTime endDate = LocalDateTime.parse(fields[5], dateTimeFormatter);
                     String toothColor = fields[6];
                     String material = fields[7];
+                    Boolean finished = Boolean.valueOf(fields[8]);
 
-                    Case caseObj = new Case(caseId, name, surname, description, startDate, endDate, toothColor, material, false);
+                    Case caseObj = new Case(caseId, name, surname, description, startDate, endDate, toothColor, material, finished);
                     cases.add(caseObj);
                 }
             }

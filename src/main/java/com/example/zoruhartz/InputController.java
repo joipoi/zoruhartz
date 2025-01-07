@@ -8,6 +8,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.function.UnaryOperator;
+import java.util.regex.Pattern;
 
 
 public class InputController {
@@ -31,39 +33,44 @@ public class InputController {
     private TextField material;
     @FXML
     private ProgressBar progressBar;
+    @FXML
+    private Button finishedBtn;
+    @FXML
+    private Label validationLabel;
 
-    private boolean isNewCase;
+
+
     private Case currentCase;
 
     // No-argument constructor
     public InputController() {
     }
 
-    // Setter method to pass data
-    public void setData(Case currentCase, boolean isNewCase) {
+    public void setData(Case currentCase) {
         this.currentCase = currentCase;
-        this.isNewCase = isNewCase;
-
         if (currentCase != null) {
-            setData(currentCase);
-            caseId.setDisable(true);
-        }
-    }
-
-    public void setData(Case data) {
-        if (data != null) {
-            caseId.setText(data.getCaseId());
-            name.setText(data.getName());
-            surname.setText(data.getSurname());
-            description.setText(data.getDescription());
-            material.setText(data.getMaterial());
-            toothColor.setText(data.getToothColor());
-            startDate.setValue(LocalDate.from(data.getStartDate()));
-            endDate.setValue(LocalDate.from(data.getEndDate()));
+            caseId.setText(currentCase.getCaseId());
+            name.setText(currentCase.getName());
+            surname.setText(currentCase.getSurname());
+            description.setText(currentCase.getDescription());
+            material.setText(currentCase.getMaterial());
+            toothColor.setText(currentCase.getToothColor());
+            startDate.setValue(currentCase.getStartDate());
+            endDate.setValue(LocalDate.from(currentCase.getEndDate()));
 
             DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
-            endDateTime.setText(data.getEndDate().format(timeFormatter));
+            endDateTime.setText(currentCase.getEndDate().format(timeFormatter));
             updateProgress();
+
+            caseId.setDisable(true);
+            if(currentCase.isFinished()){
+                finishedBtn.setText("Regret Finished");
+            }
+
+        }else{
+            progressBar.setVisible(false);
+            finishedBtn.setVisible(false);
+
         }
     }
 
@@ -102,6 +109,11 @@ public class InputController {
 
     @FXML
     private void onSave() {
+        if(!inputValidation()){
+            validationLabel.setText("Some fields are empty or time is wrong format(hh:mm)");
+            return;
+        }
+
         // Gather input from UI elements
         String caseIdValue = caseId.getText();
         String nameValue = name.getText();
@@ -144,9 +156,25 @@ public class InputController {
         stage.close();
 
     }
+    private boolean inputValidation(){
+        //check for empty fields
+        if (endDateTime.getText().isEmpty() ||  endDate.getValue() == null ||  startDate.getValue() == null ||
+        caseId.getText().isEmpty() || name.getText().isEmpty() || surname.getText().isEmpty() || material.getText().isEmpty() ||
+                description.getText().isEmpty() || toothColor.getText().isEmpty()) {
+            return false;
+        }
+       /* //check dates make sense
+        if(endDate.getValue().isBefore(startDate.getValue())){
+        return false;
+        }*/
+
+        //check time is in right format
+        Pattern timePattern = Pattern.compile("^(?:[01]\\d|2[0-3]):[0-5]\\d$");
+        return timePattern.matcher(endDateTime.getText()).matches();
+    }
     @FXML
     private void onFinishedButtonClick() {
-    currentCase.setFinished(true);
+    currentCase.setFinished(!currentCase.isFinished());
     }
 
 
