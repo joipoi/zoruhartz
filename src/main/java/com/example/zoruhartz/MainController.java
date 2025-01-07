@@ -15,6 +15,8 @@ import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 
 import java.io.*;
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -94,7 +96,7 @@ public class MainController {
                 }
             }
         });
-        File file = new File("src/main/resources/data.csv");
+        File file = getResourceFile("data.csv");
         caseList.clear();
         caseList.addAll(importCasesFromCSV(file));
     }
@@ -105,7 +107,7 @@ public class MainController {
     }
     @FXML
     private void onSave(){
-        exportCasesToCSV("src/main/resources/data.csv");
+        exportCasesToCSV("data.csv");
         saveLabel.setText("Data saved");
     }
     @FXML
@@ -154,7 +156,7 @@ public class MainController {
             fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
             file = fileChooser.showSaveDialog(null);
         }else{
-            file = new File(filename);
+            file = getResourceFile("src/main/resources/data.csv");
         }
 
         if (file != null) {
@@ -218,6 +220,16 @@ public class MainController {
         }
 
         return cases;
+    }
+
+    public static File getResourceFile(String resourcePath) {
+        try {
+            // Get the resource as a URL and convert it to a File
+            return Paths.get(MainController.class.getClassLoader().getResource(resourcePath).toURI()).toFile();
+        } catch (NullPointerException | URISyntaxException e) {
+            System.err.println("Resource not found: " + resourcePath);
+            return null; // Or handle it appropriately
+        }
     }
 
 }
