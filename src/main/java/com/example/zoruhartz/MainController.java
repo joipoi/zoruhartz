@@ -1,13 +1,13 @@
 package com.example.zoruhartz;
 
-import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.fxml.FXML;
@@ -15,13 +15,13 @@ import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 
 import java.io.*;
-import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class MainController {
@@ -31,25 +31,22 @@ public class MainController {
     private ListView<Case> listView;
 
 
-    public static ObservableList<Case> caseList = FXCollections.observableArrayList();
+    private ObservableList<Case> caseList = FXCollections.observableArrayList();
 
-    public static void addCase(Case newCase) {
-        caseList.add(newCase);
-        System.out.println(caseList);
+    public ObservableList<Case> getCaseList() {
+        return caseList;
     }
-
-    public static void removeCase(Case caseToRemove) {
-        caseList.remove(caseToRemove);
+    public void addCase(Case _case){
+        caseList.add(_case);
     }
-
-    private Case getCaseById(String caseId) {
-        for (Case caseItem : caseList) {
-            if (caseItem.getCaseId().equals(caseId)) {
-                return caseItem;
-            }
+    public void setCaseItem(int index, Case newCase) {
+        if (index >= 0 && index < caseList.size()) {
+            caseList.set(index, newCase);
+        } else {
+            System.out.println("Index out of bounds: " + index);
         }
-        return null;
     }
+
     @FXML
     public void initialize() {
         listView.setItems(caseList);
@@ -59,9 +56,11 @@ public class MainController {
             protected void updateItem(Case item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty || item == null) {
-                    setText(null);
+                    setGraphic(null);
+                    setStyle(null);
                 } else {
                     HBox hbox = new HBox();
+                    hbox.getChildren().clear();
                     hbox.setSpacing(10);
 
                     Text caseIdText = new Text("ID: " + item.getCaseId());
@@ -87,23 +86,23 @@ public class MainController {
                     }
                 }
             }
+
         });
         listView.setOnMouseClicked(event -> {
             if (event.getClickCount() == 1) { // Single click
                 Case selectedCase = listView.getSelectionModel().getSelectedItem();
                 if (selectedCase != null) {
-                    openNewWindow(selectedCase);
+                    openInputWindow(selectedCase);
                 }
             }
         });
-        File file = getResourceFile("data.csv");
-        caseList.clear();
-        caseList.addAll(importCasesFromCSV(file));
+        Path filePath = Paths.get("src/main/resources/data.csv");
+       caseList.addAll(importCasesFromCSV(filePath));
     }
 
     @FXML
     private void onAddCase(){
-     openNewWindow(null);
+     openInputWindow(null);
     }
     @FXML
     private void onSave(){
@@ -114,8 +113,38 @@ public class MainController {
     private void onExport(){
         exportCasesToCSV(null);
     }
+    @FXML
+    private void onViewChart(){
+        openChartWindow();
+    }
 
-    private void openNewWindow(Case selectedItem) {
+    private void openChartWindow() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("chart-view.fxml"));
+            StackPane newWindowRoot = loader.load();
+
+            // Create an instance of GanttChartRenderer
+            ChartController chartRenderer = loader.getController();
+            chartRenderer.setMainController(this);
+            chartRenderer.setCaseList(caseList);
+
+
+            // Add the Gantt chart to the loaded FXML root layout
+            chartRenderer.createAndSetChart();
+            chartRenderer.addToScene(newWindowRoot);
+            Stage newWindow = new Stage();
+            newWindow.setTitle("Chart");
+            newWindow.setScene(new Scene(newWindowRoot, 800, 600)); // Optional: Set preferred size
+
+
+
+            newWindow.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void openInputWindow(Case selectedItem) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("input-view.fxml"));
             GridPane newWindowRoot = loader.load();
@@ -125,6 +154,7 @@ public class MainController {
             newWindow.setScene(new Scene(newWindowRoot));
 
             InputController newWindowController = loader.getController();
+            newWindowController.setMainController(this);
             newWindowController.setData(selectedItem);
 
             newWindow.show();
@@ -135,32 +165,37 @@ public class MainController {
 
 
     @FXML
-    private void importCasesFromCSV() {
+    private void onImport() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open CSV File");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
 
         File file = fileChooser.showOpenDialog(null);
         if (file != null) {
+            System.out.println("Before clear: " + caseList);
             caseList.clear();
-            caseList.addAll(importCasesFromCSV(file));
+            System.out.println("After clear: " + caseList);
+            caseList.add(new Case("1", "Test", "User", "Description", LocalDate.now(), LocalDateTime.now(), "Color", "Material", false));
+            System.out.println("After add: " + caseList);
+
         }
     }
 
     @FXML
     private void exportCasesToCSV(String filename) {
-        File file;
-        if(filename == null){
+        Path filePath;
+        if (filename == null) {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Save Cases to CSV");
             fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
-            file = fileChooser.showSaveDialog(null);
-        }else{
-            file = getResourceFile("src/main/resources/data.csv");
+            File file = fileChooser.showSaveDialog(null);
+            filePath = file != null ? file.toPath() : null;
+        } else {
+            filePath = Paths.get("src/main/resources/data.csv");
         }
 
-        if (file != null) {
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+        if (filePath != null) {
+            try (BufferedWriter writer = Files.newBufferedWriter(filePath)) {
                 writer.write("Case ID,Name,Surname,Description,Start Date,End Date,Tooth Color,Material,Finished");
                 writer.newLine();
 
@@ -183,14 +218,14 @@ public class MainController {
         }
     }
 
-    public List<Case> importCasesFromCSV(File file) {
+    private List<Case> importCasesFromCSV(Path filePath) {
         List<Case> cases = new ArrayList<>();
         final int fieldsCount = 9;
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+        try (BufferedReader reader = Files.newBufferedReader(filePath)) {
             String line;
-            reader.readLine();
+            reader.readLine(); // Skip header
 
             while ((line = reader.readLine()) != null) {
                 String[] fields = line.split(",");
@@ -218,18 +253,7 @@ public class MainController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return cases;
-    }
-
-    public static File getResourceFile(String resourcePath) {
-        try {
-            // Get the resource as a URL and convert it to a File
-            return Paths.get(MainController.class.getClassLoader().getResource(resourcePath).toURI()).toFile();
-        } catch (NullPointerException | URISyntaxException e) {
-            System.err.println("Resource not found: " + resourcePath);
-            return null; // Or handle it appropriately
-        }
     }
 
 }

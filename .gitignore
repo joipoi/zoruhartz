@@ -2,6 +2,7 @@ target/
 out/
 .mvn/
 test.ics
+src/main/resources/data.csv
 
 mvnw
 mvnw.cmd

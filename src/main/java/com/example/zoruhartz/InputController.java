@@ -42,8 +42,14 @@ public class InputController {
 
     private Case currentCase;
 
+    private MainController mainController;
+
     // No-argument constructor
     public InputController() {
+    }
+
+    public void setMainController(MainController controller) {
+        this.mainController = controller; // Store the reference
     }
 
     public void setData(Case currentCase) {
@@ -141,14 +147,14 @@ public class InputController {
             currentCase.setEndDate(receiptDateTime);
             System.out.println("Updated case: " + currentCase);
 
-            int index = MainController.caseList.indexOf(currentCase);
+            int index = mainController.getCaseList().indexOf(currentCase);
             if (index != -1) {
-                MainController.caseList.set(index, currentCase); // Replace the item
+                mainController.setCaseItem(index,currentCase); // Replace the item
             }
         } else {
             Case newCase = new Case(caseIdValue, nameValue, surnameValue, descriptionValue,
                     startDateValue, receiptDateTime, toothColorValue, materialValue, false);
-            MainController.addCase(newCase);
+            mainController.addCase(newCase);
             System.out.println("Added new case: " + newCase);
         }
 

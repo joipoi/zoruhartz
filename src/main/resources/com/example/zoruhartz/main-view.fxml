@@ -11,8 +11,9 @@
     <HBox spacing="10">
     <Button onAction="#onAddCase" text="Add case"/>
     <Button onAction="#onExport" text="Export To CSV File"/>
-    <Button onAction="#importCasesFromCSV" text="Import CSV File" />
+    <Button onAction="#onImport" text="Import CSV File" />
     <Button onAction="#onSave" text="Save Current Case List" />
+        <Button onAction="#onViewChart" text="View Chart"/>
     <Label fx:id="saveLabel"> </Label>
     </HBox>
 </VBox>
