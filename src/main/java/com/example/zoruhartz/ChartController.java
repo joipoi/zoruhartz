@@ -1,18 +1,24 @@
 package com.example.zoruhartz;
 
-import javafx.collections.FXCollections;
+
 import javafx.collections.ObservableList;
 import javafx.scene.layout.StackPane;
 import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartTheme;
 import org.jfree.chart.JFreeChart;
-import org.jfree.data.category.DefaultCategoryDataset;
-import org.jfree.data.category.DefaultIntervalCategoryDataset;
+import org.jfree.chart.StandardChartTheme;
+import org.jfree.chart.labels.*;
+import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.renderer.category.GanttRenderer;
+import org.jfree.chart.title.TextTitle;
 import org.jfree.chart.fx.ChartViewer;
+import org.jfree.chart.ui.RectangleInsets;
+import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.gantt.*;
 
 
+import java.awt.*;
 import java.util.Date;
-import java.time.LocalDate;
 import java.time.ZoneId;
 
 public class ChartController {
@@ -56,7 +62,7 @@ public class ChartController {
     }
 
     private JFreeChart createChart(GanttCategoryDataset dataset) {
-        return ChartFactory.createGanttChart(
+        JFreeChart chart = ChartFactory.createGanttChart(
                 "Cases", // Title
                 "CaseId",       // X-Axis Label
                 "Date",        // Y-Axis Label
@@ -65,6 +71,37 @@ public class ChartController {
                 true,          // Tooltips
                 true          // URLs
         );
+        GanttRenderer renderer = new GanttRenderer();
+        CategoryPlot plot = chart.getCategoryPlot();
+       /* renderer.setSeriesPaint(0, Color.RED);
+        renderer.setSeriesStroke(0, new BasicStroke(1.0f));
+        plot.setBackgroundPaint(Color.LIGHT_GRAY);
+        chart.setBackgroundPaint(Color.WHITE);
+        chart.setTitle(new TextTitle("Custom Gantt Chart", new Font("Arial", Font.BOLD, 16)));
+        chart.setPadding(new RectangleInsets());
+        chart.addSubtitle(new TextTitle("Time to generate 1000 charts in SVG "
+                + "format (lower bars = better performance)"));
+        renderer.setDefaultItemLabelsVisible(true);
+
+        // Create the item label generator
+        IntervalCategoryItemLabelGenerator itemLabelGenerator = new IntervalCategoryItemLabelGenerator() {
+            @Override
+            public String generateLabel(CategoryDataset dataset, int row, int column) {
+                // Customize the label text here
+                return "Task: " + dataset.getRowKey(row).toString();
+            }
+        };
+
+// Set the item label generator
+        renderer.setDefaultItemLabelGenerator(itemLabelGenerator);
+        renderer.setDefaultItemLabelFont(new Font("Arial", Font.BOLD, 12)); // Set font for item labels
+*/
+
+        renderer.setDefaultToolTipGenerator((dataset1, row, column) -> caseList[column].toStringLong());
+
+        plot.setRenderer(renderer);
+
+        return chart;
     }
 
     public void addToScene(StackPane root) {

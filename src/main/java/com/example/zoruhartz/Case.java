@@ -118,16 +118,14 @@ public class Case {
         return "id: " + this.getCaseId() + " Name: " + this.getName() + this.getSurname() + " Date: " + this.getEndDate();
     }
 
-   /* @Override
-    public String toString() {
-        return "Case{" +
-                "caseId='" + caseId + '\'' +
-                ", name='" + name + '\'' +
-                ", surname='" + surname + '\'' +
-                ", description='" + description + '\'' +
-                ", receiptDate=" + receiptDate +
-                ", toothColor='" + toothColor + '\'' +
-                ", material='" + material + '\'' +
-                '}';
-    } */
+
+    public String toStringLong() {
+        return  "caseId='" + this.getCaseId() + "\n" +
+                "name='" + this.getName() + ' ' + this.getSurname() +  "\n" +
+                "description='" + this.getDescription() + "\n" +
+                "StartDate=" + this.getStartDate() +"\n"+
+                "EndDate='" + this.getEndDate() + "\n" +
+                "toothColor='" + this.getToothColor() +"\n" +
+                "material='" + this.getMaterial();
+    }
 }

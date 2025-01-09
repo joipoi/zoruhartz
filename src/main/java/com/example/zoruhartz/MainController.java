@@ -23,6 +23,10 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.csv.CSVRecord;
 
 public class MainController {
     @FXML
@@ -175,13 +179,14 @@ public class MainController {
             System.out.println("Before clear: " + caseList);
             caseList.clear();
             System.out.println("After clear: " + caseList);
-            caseList.add(new Case("1", "Test", "User", "Description", LocalDate.now(), LocalDateTime.now(), "Color", "Material", false));
+           // caseList.add(new Case("1", "Test", "User", "Description", LocalDate.now(), LocalDateTime.now(), "Color", "Material", false));
+            Path filePath = Paths.get(file.getPath());
+            caseList.addAll(importCasesFromCSV(filePath));
             System.out.println("After add: " + caseList);
 
         }
     }
 
-    @FXML
     private void exportCasesToCSV(String filename) {
         Path filePath;
         if (filename == null) {
@@ -195,12 +200,11 @@ public class MainController {
         }
 
         if (filePath != null) {
-            try (BufferedWriter writer = Files.newBufferedWriter(filePath)) {
-                writer.write("Case ID,Name,Surname,Description,Start Date,End Date,Tooth Color,Material,Finished");
-                writer.newLine();
+            try (BufferedWriter writer = Files.newBufferedWriter(filePath);
+                 CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader("Case ID", "Name", "Surname", "Description", "Start Date", "End Date", "Tooth Color", "Material", "Finished"))) {
 
                 for (Case caseObj : caseList) {
-                    writer.write(String.format("%s,%s,%s,%s,%s,%s,%s,%s,%s",
+                    csvPrinter.printRecord(
                             caseObj.getCaseId(),
                             caseObj.getName(),
                             caseObj.getSurname(),
@@ -209,9 +213,11 @@ public class MainController {
                             caseObj.getEndDate(),
                             caseObj.getToothColor(),
                             caseObj.getMaterial(),
-                            caseObj.isFinished()));
-                    writer.newLine();
+                            caseObj.isFinished()
+                    );
                 }
+
+                csvPrinter.flush(); // Ensure all data is written out
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -220,33 +226,27 @@ public class MainController {
 
     private List<Case> importCasesFromCSV(Path filePath) {
         List<Case> cases = new ArrayList<>();
-        final int fieldsCount = 9;
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
 
-        try (BufferedReader reader = Files.newBufferedReader(filePath)) {
-            String line;
-            reader.readLine(); // Skip header
+        try (BufferedReader reader = Files.newBufferedReader(filePath);
+             CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withHeader())) {
 
-            while ((line = reader.readLine()) != null) {
-                String[] fields = line.split(",");
+            for (CSVRecord csvRecord : csvParser) {
+                // Accessing the fields by header name
+                String caseId = csvRecord.get("Case ID");
+                String name = csvRecord.get("Name");
+                String surname = csvRecord.get("Surname");
+                String description = csvRecord.get("Description").replace("\"", ""); // Remove quotes if necessary
 
-                if (fields.length == fieldsCount) {
-                    String caseId = fields[0];
-                    String name = fields[1];
-                    String surname = fields[2];
-                    String description = fields[3];
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                LocalDate startDate = LocalDate.parse(csvRecord.get("Start Date"), formatter);
+                LocalDateTime endDate = LocalDateTime.parse(csvRecord.get("End Date"), dateTimeFormatter);
+                String toothColor = csvRecord.get("Tooth Color");
+                String material = csvRecord.get("Material");
+                Boolean finished = Boolean.valueOf(csvRecord.get("Finished"));
 
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                    LocalDate startDate = LocalDate.parse(fields[4], formatter);
-
-                    LocalDateTime endDate = LocalDateTime.parse(fields[5], dateTimeFormatter);
-                    String toothColor = fields[6];
-                    String material = fields[7];
-                    Boolean finished = Boolean.valueOf(fields[8]);
-
-                    Case caseObj = new Case(caseId, name, surname, description, startDate, endDate, toothColor, material, finished);
-                    cases.add(caseObj);
-                }
+                Case caseObj = new Case(caseId, name, surname, description, startDate, endDate, toothColor, material, finished);
+                cases.add(caseObj);
             }
         } catch (IOException e) {
             e.printStackTrace();

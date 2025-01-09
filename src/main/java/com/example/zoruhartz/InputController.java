@@ -119,15 +119,15 @@ public class InputController {
             validationLabel.setText("Some fields are empty or time is wrong format(hh:mm)");
             return;
         }
-
         // Gather input from UI elements
         String caseIdValue = caseId.getText();
         String nameValue = name.getText();
         String surnameValue = surname.getText();
-        String descriptionValue = description.getText();
+        String descriptionValue = description.getText() ;
         String toothColorValue = toothColor.getText();
         String materialValue = material.getText();
         LocalDate startDateValue = startDate.getValue();
+        System.out.println(descriptionValue);
 
         // Get the selected date and time
         LocalDateTime receiptDateTime = null;
