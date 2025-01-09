@@ -126,6 +126,7 @@ public class Case {
                 "StartDate=" + this.getStartDate() +"\n"+
                 "EndDate='" + this.getEndDate() + "\n" +
                 "toothColor='" + this.getToothColor() +"\n" +
-                "material='" + this.getMaterial();
+                "material='" + this.getMaterial() +"\n" +
+                "Finished='" + this.isFinished();
     }
 }
