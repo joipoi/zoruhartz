@@ -117,7 +117,7 @@ public class MainController {
     private void onExport(){
         exportCasesToCSV(null);
     }
-    @FXML
+    /*@FXML
     private void onViewChart(){
         openChartWindow();
     }
@@ -143,7 +143,7 @@ public class MainController {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
+    } */
 
     private void openInputWindow(Case selectedItem) {
         try {

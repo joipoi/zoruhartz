@@ -1,19 +1,13 @@
-package com.example.zoruhartz;
+/*package com.example.zoruhartz;
 
 
 import javafx.collections.ObservableList;
 import javafx.scene.layout.StackPane;
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartTheme;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.StandardChartTheme;
-import org.jfree.chart.labels.*;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.renderer.category.GanttRenderer;
-import org.jfree.chart.title.TextTitle;
 import org.jfree.chart.fx.ChartViewer;
-import org.jfree.chart.ui.RectangleInsets;
-import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.gantt.*;
 
 
@@ -108,7 +102,7 @@ public class ChartController {
 // Set the item label generator
         renderer.setDefaultItemLabelGenerator(itemLabelGenerator);
         renderer.setDefaultItemLabelFont(new Font("Arial", Font.BOLD, 12)); // Set font for item labels
-*/
+
 
         renderer.setDefaultToolTipGenerator((dataset1, row, column) -> caseList[column].toStringLong());
 
@@ -122,4 +116,4 @@ public class ChartController {
     }
 
 
-}
+} */

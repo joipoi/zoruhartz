@@ -39,17 +39,16 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
+       <!-- <dependency>
             <groupId>org.jfree</groupId>
             <artifactId>jfreechart</artifactId>
-            <version>1.5.3</version>
+            <version>1.5.5</version>
         </dependency>
         <dependency>
             <groupId>org.jfree</groupId>
             <artifactId>org.jfree.chart.fx</artifactId>
             <version>2.0.1</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-csv -->
+        </dependency> -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-csv</artifactId>
@@ -76,7 +75,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.example.zoruhartz.Main</mainClass> <!-- Update with your main class -->
+                            <mainClass>com.example.zoruhartz.Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
