@@ -28,9 +28,9 @@ public class InputController {
     @FXML
     private TextArea description;
     @FXML
-    private TextField toothColor;
+    private ComboBox<String> toothColor;
     @FXML
-    private TextField material;
+    private ComboBox<String> material;
     @FXML
     private ProgressBar progressBar;
     @FXML
@@ -59,8 +59,8 @@ public class InputController {
             name.setText(currentCase.getName());
             surname.setText(currentCase.getSurname());
             description.setText(currentCase.getDescription());
-            material.setText(currentCase.getMaterial());
-            toothColor.setText(currentCase.getToothColor());
+            material.setValue(currentCase.getMaterial());
+            toothColor.setValue(currentCase.getToothColor());
             startDate.setValue(currentCase.getStartDate());
             endDate.setValue(LocalDate.from(currentCase.getEndDate()));
 
@@ -82,34 +82,37 @@ public class InputController {
 
     @FXML
     public void initialize() {
+        toothColor.getItems().addAll(
+                "A1", "A2", "A3", "A3.5", "A4",
+                "B1", "B2", "B3", "B4",
+                "C1", "C2", "C3", "C4",
+                "D1", "D2", "D3", "D4"
+        );
 
+        material.getItems().addAll(
+                "NEM", "G3", "T6"
+        );
+        material.setEditable(true);
     }
 
     private void updateProgress() {
         LocalDate currentDate = LocalDate.now();
 
-        // Ensure startDate and endDate are not null
         if (startDate != null && endDate != null) {
-            // Calculate total duration
             long totalDays = ChronoUnit.DAYS.between(currentCase.getStartDate(), currentCase.getEndDate());
 
-            // Calculate elapsed duration
             long elapsedDays = ChronoUnit.DAYS.between(currentCase.getStartDate(), currentDate);
 
-            // Ensure progress does not exceed 100%
             if (elapsedDays < 0) {
-                // Case has not started yet
                 progressBar.setProgress(0);
             } else if (elapsedDays > totalDays) {
-                // Case has already ended
                 progressBar.setProgress(1);
             } else {
-                // Calculate progress as a fraction
                 double progress = (double) elapsedDays / totalDays;
                 progressBar.setProgress(progress);
             }
         } else {
-            progressBar.setProgress(0); // Default to 0 if dates are not set
+            progressBar.setProgress(0);
         }
     }
 
@@ -119,17 +122,15 @@ public class InputController {
             validationLabel.setText("Some fields are empty or time is wrong format(hh:mm)");
             return;
         }
-        // Gather input from UI elements
         String caseIdValue = caseId.getText();
         String nameValue = name.getText();
         String surnameValue = surname.getText();
         String descriptionValue = description.getText() ;
-        String toothColorValue = toothColor.getText();
-        String materialValue = material.getText();
+        String toothColorValue = toothColor.getValue();
+        String materialValue = material.getValue();
         LocalDate startDateValue = startDate.getValue();
         System.out.println(descriptionValue);
 
-        // Get the selected date and time
         LocalDateTime receiptDateTime = null;
         if (endDate.getValue() != null && !endDateTime.getText().isEmpty()) {
             String dateString = endDate.getValue().toString() + " " + endDateTime.getText();
@@ -149,7 +150,7 @@ public class InputController {
 
             int index = mainController.getCaseList().indexOf(currentCase);
             if (index != -1) {
-                mainController.setCaseItem(index,currentCase); // Replace the item
+                mainController.setCaseItem(index,currentCase);
             }
         } else {
             Case newCase = new Case(caseIdValue, nameValue, surnameValue, descriptionValue,
@@ -163,10 +164,9 @@ public class InputController {
 
     }
     private boolean inputValidation(){
-        //check for empty fields
         if (endDateTime.getText().isEmpty() ||  endDate.getValue() == null ||  startDate.getValue() == null ||
-        caseId.getText().isEmpty() || name.getText().isEmpty() || surname.getText().isEmpty() || material.getText().isEmpty() ||
-                description.getText().isEmpty() || toothColor.getText().isEmpty()) {
+        caseId.getText().isEmpty() || name.getText().isEmpty() || surname.getText().isEmpty() ||
+                description.getText().isEmpty()) {
             return false;
         }
        /* //check dates make sense
@@ -181,6 +181,7 @@ public class InputController {
     @FXML
     private void onFinishedButtonClick() {
     currentCase.setFinished(!currentCase.isFinished());
+        validationLabel.setText("Changed finished");
     }
 
 

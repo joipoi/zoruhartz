@@ -5,13 +5,13 @@ st,
 hello this 
 is 
 me using spaces,
-ah.",2025-01-01,2025-02-15T14:30,A4,G1,true
-"#QS185",Robert,Doe,Reperatur,2025-01-10,2025-01-28T15:15,A3,G2,false
-"#1AB2996",John,Smith,Kronen,2025-01-11,2025-01-29T12:30,B1,Gold,true
+ah.",2025-01-01,2025-02-15T14:30,B1,NEM,true
+"#QS185",Robert,Doe,Reperatur,2025-01-10,2025-01-28T15:15,A3,NEM,false
+"#1AB2996",John,Smith,Kronen,2025-01-11,2025-01-29T12:30,B1,NEM,true
 "#2PK2336",Joe,Doe,Reperatur,2025-02-02,2025-03-01T12:30,A1,G3,true
-"#3RB1456",Charlie,Whiley,Kronen,2025-02-09,2025-02-15T14:30,A4,G1,true
-"#4QS185",Samuel,Doe,Reperatur,2025-02-14,2025-03-01T15:15,A3,G2,false
-"#5AB2996",Thomas,Smith,Kronen,2025-02-25,2025-03-15T12:30,B1,Gold,true
+"#3RB1456",Charlie,Whiley,Kronen,2025-02-09,2025-02-15T14:30,C1,NEM,true
+"#4QS185",Samuel,Doe,Reperatur,2025-02-14,2025-03-01T15:15,A3,D1,false
+"#5AB2996",Thomas,Smith,Kronen,2025-02-25,2025-03-15T12:30,B1,NEM,true
 "#6PK2336",Pete,Doe,Reperatur,2025-03-01,2025-03-15T12:30,A1,G3,true
-"#7RB1456",Sandra,Whiley,Kronen,2025-03-12,2025-03-20T14:30,A4,G1,true
-"#8QS185",Pier,Doe,Reperatur,2025-03-24,2025-04-05T15:15,A3,G2,false
+"#7RB1456",Sandra,Whiley,Kronen,2025-03-12,2025-03-20T14:30,A4,G3,true
+"#8QS185",Pier,Doe,Reperatur,2025-03-24,2025-04-05T15:15,A3,G3,false

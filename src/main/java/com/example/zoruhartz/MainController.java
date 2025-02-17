@@ -4,10 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.fxml.FXML;
@@ -63,25 +60,29 @@ public class MainController {
                     setGraphic(null);
                     setStyle(null);
                 } else {
-                    HBox hbox = new HBox();
-                    hbox.getChildren().clear();
-                    hbox.setSpacing(10);
+                    GridPane grid = new GridPane();
+                    grid.setHgap(10);
 
                     Text caseIdText = new Text("ID: " + item.getCaseId());
                     Text nameText = new Text("Name: " + item.getName() +" "+ item.getSurname());
-                    Text endDateText = new Text("End Date: " + item.getEndDate().toString());
+                    Text endDateText = new Text("End Date: " + item.getEndDateString());
                     Text finished = new Text(item.isFinished() ? "Finished" : "Not Finished");
-                    /*
-                    Button deleteButton = new Button("Delete");
-                    deleteButton.setOnAction(event -> {
-                        caseList.removeCase(item);
-                        System.out.println(caseList);
-                        listView.setItems(caseList);
-                    }); */
 
-                    hbox.getChildren().addAll(caseIdText, nameText, endDateText, finished);
+                    // Add columns with specific constraints
+                    ColumnConstraints col1 = new ColumnConstraints();
+                    col1.setPrefWidth(100);
+                    ColumnConstraints col2 = new ColumnConstraints();
+                    col2.setPrefWidth(200);
+                    ColumnConstraints col3 = new ColumnConstraints();
+                    col3.setPrefWidth(150);
+                    grid.getColumnConstraints().addAll(col1, col2, col3);
 
-                    setGraphic(hbox);
+                    grid.add(caseIdText, 0, 0);
+                    grid.add(nameText, 1, 0);
+                    grid.add(endDateText, 2, 0);
+                    grid.add(finished, 3, 0);
+
+                    setGraphic(grid);
 
                     if (item.isFinished()) {
                         setStyle("-fx-background-color: lightgreen;");
@@ -90,7 +91,6 @@ public class MainController {
                     }
                 }
             }
-
         });
         listView.setOnMouseClicked(event -> {
             if (event.getClickCount() == 1) { // Single click
@@ -127,18 +127,15 @@ public class MainController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("chart-view.fxml"));
             StackPane newWindowRoot = loader.load();
 
-            // Create an instance of GanttChartRenderer
             ChartController chartRenderer = loader.getController();
             chartRenderer.setMainController(this);
             chartRenderer.setCaseList(caseList);
 
-
-            // Add the Gantt chart to the loaded FXML root layout
             chartRenderer.createAndSetChart();
             chartRenderer.addToScene(newWindowRoot);
             Stage newWindow = new Stage();
             newWindow.setTitle("Chart");
-            newWindow.setScene(new Scene(newWindowRoot, 800, 600)); // Optional: Set preferred size
+            newWindow.setScene(new Scene(newWindowRoot, 800, 600));
 
 
 

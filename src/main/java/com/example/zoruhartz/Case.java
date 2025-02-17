@@ -92,13 +92,13 @@ public class Case {
     public LocalDateTime getEndDate() {
         return endDate.get();
     }
-    public String getEndTime() {
+    public String getEndDateString() {
         LocalDateTime _endDate = endDate.get();
         if (_endDate != null) {
-            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+            DateTimeFormatter timeFormatter = DateTimeFormatter.ISO_LOCAL_DATE;
             return _endDate.format(timeFormatter);
         }
-        return null; // or return an empty string, depending on your preferenceSimpleDateFormat localDateFormat = new SimpleDateFormat("HH:mm");
+        return null;
 
     }
     public LocalDate getStartDate() {
