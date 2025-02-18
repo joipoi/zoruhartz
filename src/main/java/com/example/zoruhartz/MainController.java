@@ -5,6 +5,8 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.fxml.FXML;
@@ -18,12 +20,25 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
+
+import java.util.Arrays;
+
+import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.scene.Scene;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
+import javafx.scene.paint.Color;
+import javafx.stage.Stage;
+import com.example.zoruhartz.GanttChart.ExtraData;
 
 public class MainController {
     @FXML
@@ -117,33 +132,57 @@ public class MainController {
     private void onExport(){
         exportCasesToCSV(null);
     }
-    /*@FXML
+
+    @FXML
     private void onViewChart(){
         openChartWindow();
     }
+    private void openChartWindow(){
+            final NumberAxis xAxis = new NumberAxis();
+            final CategoryAxis yAxis = new CategoryAxis();
 
-    private void openChartWindow() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("chart-view.fxml"));
-            StackPane newWindowRoot = loader.load();
+            final GanttChart<Number,String> chart = new GanttChart<Number,String>(xAxis,yAxis);
 
-            ChartController chartRenderer = loader.getController();
-            chartRenderer.setMainController(this);
-            chartRenderer.setCaseList(caseList);
+        xAxis.setTickLabelsVisible(false);
+        xAxis.setTickMarkVisible(false);
 
-            chartRenderer.createAndSetChart();
-            chartRenderer.addToScene(newWindowRoot);
-            Stage newWindow = new Stage();
+        yAxis.setLabel("");
+            yAxis.setTickLabelFill(Color.CHOCOLATE);
+            yAxis.setTickLabelGap(10);
+
+            chart.setTitle("Cases");
+            chart.setLegendVisible(false);
+            chart.setBlockHeight( 50);
+
+            LocalDate[] dateRange = getDateRange();
+            LocalDate startDate= dateRange[0];
+
+            for (Case caseItem : caseList) {
+                LocalDate caseStart = caseItem.getStartDate();
+                LocalDate caseEnd = caseItem.getEndDate().toLocalDate();
+
+                int start = (int) ChronoUnit.DAYS.between(startDate, caseStart);
+                int length = (int) ChronoUnit.DAYS.between(caseStart, caseEnd);
+                String style;
+                if(caseItem.isFinished()){
+                    style="status-green";
+                }else{
+                    style="status-red";
+                }
+
+                XYChart.Series caseSeries = new XYChart.Series();
+                caseSeries.getData().add(new XYChart.Data(start, caseItem.getCaseId(), new ExtraData( length, style)));
+
+                chart.getData().add(caseSeries);
+            }
+
+        chart.getStylesheets().add(getClass().getResource("ganttchart.css").toExternalForm());
+
+        Stage newWindow = new Stage();
             newWindow.setTitle("Chart");
-            newWindow.setScene(new Scene(newWindowRoot, 800, 600));
-
-
-
+            newWindow.setScene(new Scene(chart,1000,800));
             newWindow.show();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    } */
+    }
 
     private void openInputWindow(Case selectedItem) {
         try {
@@ -176,7 +215,6 @@ public class MainController {
             System.out.println("Before clear: " + caseList);
             caseList.clear();
             System.out.println("After clear: " + caseList);
-           // caseList.add(new Case("1", "Test", "User", "Description", LocalDate.now(), LocalDateTime.now(), "Color", "Material", false));
             Path filePath = Paths.get(file.getPath());
             caseList.addAll(importCasesFromCSV(filePath));
             System.out.println("After add: " + caseList);
@@ -214,7 +252,7 @@ public class MainController {
                     );
                 }
 
-                csvPrinter.flush(); // Ensure all data is written out
+                csvPrinter.flush();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -229,11 +267,10 @@ public class MainController {
              CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withHeader())) {
 
             for (CSVRecord csvRecord : csvParser) {
-                // Accessing the fields by header name
                 String caseId = csvRecord.get("Case ID");
                 String name = csvRecord.get("Name");
                 String surname = csvRecord.get("Surname");
-                String description = csvRecord.get("Description").replace("\"", ""); // Remove quotes if necessary
+                String description = csvRecord.get("Description").replace("\"", "");
 
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
                 LocalDate startDate = LocalDate.parse(csvRecord.get("Start Date"), formatter);
@@ -252,5 +289,25 @@ public class MainController {
         }
         return cases;
     }
+    private LocalDate[] getDateRange() {
+        LocalDate minStartDate = null;
+        LocalDateTime maxEndDate = null;
+
+        for (Case caseItem : caseList) {
+            LocalDate caseStart = caseItem.getStartDate();
+            LocalDateTime caseEnd = caseItem.getEndDate();
+
+            if (minStartDate == null || caseStart.isBefore(minStartDate)) {
+                minStartDate = caseStart;
+            }
+
+            if (maxEndDate == null || caseEnd.isAfter(maxEndDate)) {
+                maxEndDate = caseEnd;
+            }
+        }
+
+        return new LocalDate[]{minStartDate, maxEndDate.toLocalDate()};
+    }
+
 
 }

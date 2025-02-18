@@ -1,11 +1,5 @@
 Case ID,Name,Surname,Description,Start Date,End Date,Tooth Color,Material,Finished
-"#RB1456",Johanna,Whiley,"Kronen test test tsett,es
- t,,est,test,te
-st,
-hello this 
-is 
-me using spaces,
-ah.",2025-01-01,2025-02-15T14:30,B1,NEM,true
+"#RB1456",Johanna,Whiley,"Kronen test test tsett,esah.",2025-03-01,2025-02-15T14:30,B1,NEM,true
 "#QS185",Robert,Doe,Reperatur,2025-01-10,2025-01-28T15:15,A3,NEM,false
 "#1AB2996",John,Smith,Kronen,2025-01-11,2025-01-29T12:30,B1,NEM,true
 "#2PK2336",Joe,Doe,Reperatur,2025-02-02,2025-03-01T12:30,A1,G3,true
